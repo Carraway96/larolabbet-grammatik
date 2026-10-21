@@ -2,7 +2,7 @@
 
 En statisk övningssida för svenskspråkiga elever som lär sig engelsk grammatik.
 
-Första området är **is och are**, med tre öppna nivåer och tio frågor per nivå. På nivå 1 och 2 följs varje svar av en svensk förklaring. På nivå 3 kommer rättning och förklaringar först efter sista frågan. Rätt på första svaret, ledtrådar, lokala framsteg, poäng och tre märken ingår. Resultat delas som PNG-bild: kopiera bilden till urklipp eller ladda ner den och bifoga till läraren. Det är ett elevrapporterat träningsunderlag, inte ett verifierat provresultat.
+Sidan innehåller **is/are**, **have/has** och **a/an**. Varje område har tre öppna nivåer med tio frågor per nivå: totalt nio delövningar och 90 frågor. På nivå 1 och 2 följs varje svar av en svensk förklaring. På nivå 3 kommer rättning och förklaringar först efter sista frågan. Rätt på första svaret, ledtrådar, lokala framsteg, poäng och tre märken ingår. Resultat delas som PNG-bild: kopiera bilden till urklipp eller ladda ner den och bifoga till läraren. Det är ett elevrapporterat träningsunderlag, inte ett verifierat provresultat.
 
 Stödet minskar mellan nivåerna:
 
@@ -24,21 +24,25 @@ python -m http.server 4173 --directory dist
 
 ## GitHub Pages
 
-Lägg projektet i ett GitHub-repository. Under **Settings → Pages**, välj **GitHub Actions** som källa. Den medföljande workflow-filen publicerar `dist/` vid en push till `main` eller manuell körning. Om standardgrenen heter något annat ändrar du `branches` i workflow-filen. Relativa sökvägar gör att sidan fungerar även under ett repositorynamn, exempelvis `/larolabbet-grammatik/`.
+Webbplatsen finns på https://carraway96.github.io/larolabbet-grammatik/. Projektet ligger i https://github.com/Carraway96/larolabbet-grammatik och Pages använder GitHub Actions. Vid en ny installation: Under **Settings → Pages**, välj **GitHub Actions** som källa. Den medföljande workflow-filen publicerar `dist/` vid en push till `main` eller manuell körning. Om standardgrenen heter något annat ändrar du `branches` i workflow-filen. Relativa sökvägar gör att sidan fungerar även under ett repositorynamn, exempelvis `/larolabbet-grammatik/`.
 
 Detta projekt har också en privat Sites-publicering för förhandsgranskning. `.openai/hosting.json` är konfiguration för den publiceringen och behövs inte av GitHub Pages.
 
 ## Innehåll och vidareutveckling
 
-- `dist/content.js`: nivåer, pedagogiska förklaringar, exempel och frågor. Varje fråga är `[mening med ___, rätt svar, förklaring, svensk översättning]`.
+- `dist/content.js`: de ursprungliga is/are-frågorna.
+- `dist/topics.js`: områdesmetadata, svarsalternativ, svårighetsnivåer och de 60 nya have/has- och a/an-frågorna. Frågeformat: `[mening med ___, rätt svar, förklaring, svensk översättning, tankekedja, eventuell bildtyp]`.
 - `dist/app.js`: navigation, övningsflöde, resultat och lokal lagring.
 - `dist/report-image.js`: lokal canvas-rendering av resultatbild, förhandsvisning, PNG-kopiering och nedladdning. Bilden innehåller logga, namn/elevkod, datum, nivå, stödstatus, poäng, samtliga svar, reflektion och försöks-id.
-- `dist/lesson.js`: interaktiva bildförklaringar, kontrollfrågor utan poäng och visuella tankekedjor.
+- `dist/lesson.js`: gemensam motor för bildförklaringar, kontrollfrågor och tankekedjor.
+- `dist/new-lessons.js`: ämnesanpassade förklaringar för have/has och a/an samt lokala SVG-illustrationer.
 - `dist/lesson.css`: utformning av bildförklaringen på mobil, surfplatta och dator.
 - `dist/style.css`: responsiv formgivning och tillgängliga fokusmarkeringar.
 - `dist/assets/larolabbet-logo.png`: originalfil från https://carraway96.github.io/larolabbet/assets/larolabbet-logo.png, återanvänd enligt uppdrag.
 
-Den nuvarande spelmotorn är anpassad till tio is/are-frågor per nivå. För nya grammatikområden behöver svarsalternativ och resultaträkning generaliseras.
+Spelmotorn hämtar svarsalternativ, rubriker och snabbregler från området. Nivåerna har tio frågor vardera. Gamla is/are-id:n och sparade resultat behålls. Have/has tränar enkla påståenden i presens, inte frågor med do/does eller perfekt. A/an tränar första ljudet efter artikeln, även efterföljande adjektiv och stumt h/j-ljud.
+
+Kör `node tests/content.cjs` för kontroll av 90 frågor, ämnesmetadata, illustrerade exempel, grundläggande ljudfall och bevarade id:n. Browserregressionerna i `tests/browser.cjs` och `tests/report-image.cjs` kräver Playwright.
 
 ## Lagring och återkoppling
 

@@ -48,7 +48,7 @@ async function createReportImage(attempt, name, reflection) {
   rect(0, 0, 1000, 155, green);
   if (logo) rows.push(() => ctx.drawImage(logo, 125, 118, 370, 370, 47, 36, 83, 83));
   text('Lärolabbet – Grammatik', logo ? 155 : 54, 43, 790, 36, '#ffffff', 700);
-  text('RESULTATRAPPORT · IS ELLER ARE?', logo ? 155 : 54, 91, 790, 22, '#d9ed9b', 700);
+  text(`RESULTATRAPPORT · ${getTopic(level).title.toUpperCase()}`, logo ? 155 : 54, 91, 790, 22, '#d9ed9b', 700);
   y = 193;
   y += text(name.trim() ? `Elev: ${name.trim()}` : 'Elev: ej angivet', 54, y, 892, 34, ink, 700) + 9;
   y += text(`${dateLabel(attempt.date)}  ·  ${level.tag} – ${level.name}`, 54, y, 892, 24, muted) + 24;
