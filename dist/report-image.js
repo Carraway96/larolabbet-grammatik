@@ -96,8 +96,18 @@ async function createReportImage(attempt, name, reflection) {
 }
 
 let disposeReport = () => {};
+let reportNeedsExport = false;
+function warnBeforeLeavingReport(event) {
+  event.preventDefault();
+  event.returnValue = '';
+}
+function setReportNeedsExport(pending) {
+  reportNeedsExport = pending;
+  if (pending) window.addEventListener('beforeunload', warnBeforeLeavingReport);
+  else window.removeEventListener('beforeunload', warnBeforeLeavingReport);
+}
 function reportPanel(a) {
-  return `<section class="panel image-report-panel"><div class="eyebrow">DELA DITT LÄRANDE</div><h2 style="margin-top:12px">En bild till din lärare</h2><p class="tiny">Fyll i namn eller elevkod. Kopiera sedan bilden och klistra in den i ett meddelande eller en inlämning till din lärare.</p><label class="field">Namn eller elevkod (valfritt)<input id="student-name" maxlength="100" autocomplete="off" value="${escapeHTML(reportName)}" placeholder="Till exempel elev 12"></label><label class="field">Min reflektion (valfritt)<textarea id="reflection" rows="2" maxlength="2000" placeholder="Nu förstår jag … Jag vill öva mer på …">${escapeHTML(reportReflection)}</textarea></label><figure class="report-figure"><figcaption>Din resultatbild <span>Större text och högupplöst PNG. Tryck på bilden för att läsa och zooma.</span></figcaption><div class="report-preview"><a id="report-image-open" target="_blank" rel="noopener" aria-label="Öppna resultatbilden i full storlek"><img id="report-image" alt="Resultatrapport med elev, nivå, datum, stöd, poäng, tio svar och reflektion." aria-describedby="report" hidden></a><p id="report-image-status" role="status">Skapar din resultatbild …</p></div></figure><dialog class="report-zoom" aria-labelledby="report-zoom-title"><div class="report-zoom-heading"><h3 id="report-zoom-title">Läs resultatrapporten</h3><button type="button" class="button secondary" id="close-report-zoom">Stäng</button></div><div class="report-zoom-tools" role="group" aria-label="Bildens storlek"><button type="button" class="button secondary" data-report-zoom="out" aria-label="Zooma ut">−</button><button type="button" class="button secondary" data-report-zoom="in" aria-label="Zooma in">+</button><button type="button" class="button secondary" data-report-zoom="readable">Lässtorlek</button><button type="button" class="button secondary" data-report-zoom="fit">Anpassa bredd</button></div><p class="tiny">Bläddra nedåt och i sidled för att läsa hela bilden.</p><div class="report-zoom-view" tabindex="0" aria-label="Resultatbild, kan rullas i sidled och nedåt"><img alt="Resultatrapport i förstorad visning."></div></dialog><p class="sr-only" id="report">${escapeHTML(reportText(a))}</p><div class="actions"><button class="button" id="copy">Kopiera bild <span aria-hidden="true">↗</span></button><button class="button secondary" id="download">Ladda ner bild (PNG)</button></div><p class="report-copy-status" id="report-copy-status" role="status"></p><p class="notice">Bilden skapas på din enhet. Inget skickas automatiskt. Namn och reflektion sparas inte när du laddar om sidan.</p></section>`;
+  return `<section class="panel image-report-panel"><div class="submission-heading"><div class="eyebrow">SISTA STEGET · TILL DIN LÄRARE</div><h2>Klart med övningen? Lämna in ditt resultat!</h2><p>Din lärare får inte resultatet automatiskt. Följ de här tre stegen.</p></div><ol class="submission-steps"><li><strong>Gör bilden till din</strong><span>Fyll i namn eller elevkod om läraren vill det. Lägg gärna till en reflektion.</span></li><li><strong>Kopiera resultatbilden</strong><span>Tryck på <b>Kopiera bild</b> nedan. Du kan också ladda ner bilden som PNG.</span></li><li><strong>Klistra in och lämna in</strong><span>Öppna lärarens inlämning eller meddelande. Klistra in med <b>Ctrl + V</b> (Mac: <b>⌘ + V</b>) eller bifoga PNG-filen. Tryck sedan på <b>Lämna in</b> eller <b>Skicka</b>.</span></li></ol><p id="submission-state" class="submission-state" role="status">Kvar att göra: kopiera bilden och lämna in till läraren.</p><label class="field">Namn eller elevkod (valfritt)<input id="student-name" maxlength="100" autocomplete="off" value="${escapeHTML(reportName)}" placeholder="Till exempel elev 12"></label><label class="field">Min reflektion (valfritt)<textarea id="reflection" rows="2" maxlength="2000" placeholder="Nu förstår jag … Jag vill öva mer på …">${escapeHTML(reportReflection)}</textarea></label><div class="actions"><button class="button" id="copy">Kopiera bild <span aria-hidden="true">↗</span></button><button class="button secondary" id="download">Ladda ner bild (PNG)</button></div><p class="report-copy-status" id="report-copy-status" role="status"></p><figure class="report-figure"><figcaption>Din resultatbild <span>Större text och högupplöst PNG. Tryck på bilden för att läsa och zooma.</span></figcaption><div class="report-preview"><a id="report-image-open" target="_blank" rel="noopener" aria-label="Öppna resultatbilden i full storlek"><img id="report-image" alt="Resultatrapport med elev, nivå, datum, stöd, poäng, tio svar och reflektion." aria-describedby="report" hidden></a><p id="report-image-status" role="status">Skapar din resultatbild …</p></div></figure><dialog class="report-zoom" aria-labelledby="report-zoom-title"><div class="report-zoom-heading"><h3 id="report-zoom-title">Läs resultatrapporten</h3><button type="button" class="button secondary" id="close-report-zoom">Stäng</button></div><div class="report-zoom-tools" role="group" aria-label="Bildens storlek"><button type="button" class="button secondary" data-report-zoom="out" aria-label="Zooma ut">−</button><button type="button" class="button secondary" data-report-zoom="in" aria-label="Zooma in">+</button><button type="button" class="button secondary" data-report-zoom="readable">Lässtorlek</button><button type="button" class="button secondary" data-report-zoom="fit">Anpassa bredd</button></div><p class="tiny">Bläddra nedåt och i sidled för att läsa hela bilden.</p><div class="report-zoom-view" tabindex="0" aria-label="Resultatbild, kan rullas i sidled och nedåt"><img alt="Resultatrapport i förstorad visning."></div></dialog><p class="sr-only" id="report">${escapeHTML(reportText(a))}</p><p class="notice">Bilden skapas på din enhet. Inget skickas automatiskt. Namn och reflektion sparas inte när du laddar om sidan.</p></section>`;
 }
 function bindReport(a) {
   const panel = main.querySelector('.image-report-panel');
@@ -106,7 +116,16 @@ function bindReport(a) {
   const zoomImage = zoomView.querySelector('img');
   let zoomWidth = 1000;
   let cached = null, currentURL = null, timer, revision = 0, disposed = false;
-  disposeReport = () => { disposed = true; clearTimeout(timer); if (dialog.open) dialog.close(); if (currentURL) URL.revokeObjectURL(currentURL); };
+  setReportNeedsExport(true);
+  disposeReport = () => { disposed = true; setReportNeedsExport(false); clearTimeout(timer); if (dialog.open) dialog.close(); if (currentURL) URL.revokeObjectURL(currentURL); };
+  const fieldKey = () => JSON.stringify([reportName, reportReflection]);
+  function exported(key, method) {
+    if (disposed || key !== fieldKey()) return;
+    setReportNeedsExport(false);
+    panel.querySelector('#submission-state').textContent = method === 'copy' ? 'Bilden är kopierad. Nästa steg: klistra in och lämna in!' : 'Nedladdningen har startat. Nästa steg: bifoga bilden och lämna in!';
+    panel.querySelector('#submission-state').classList.add('exported');
+    panel.querySelector('#report-copy-status').textContent = method === 'copy' ? 'Öppna lärarens inlämning, klistra in bilden med Ctrl + V (Mac: ⌘ + V) och tryck på Lämna in eller Skicka.' : 'Öppna lärarens inlämning, bifoga PNG-filen från dina nedladdningar och tryck på Lämna in eller Skicka.';
+  }
   function imageBlob() {
     const key = JSON.stringify([reportName, reportReflection]);
     if (!cached || cached.key !== key) {
@@ -137,28 +156,35 @@ function bindReport(a) {
     reportReflection = panel.querySelector('#reflection').value;
     panel.querySelector('#report').textContent = reportText(a);
     panel.querySelector('#report-copy-status').textContent = '';
+    setReportNeedsExport(true);
+    panel.querySelector('#submission-state').textContent = 'Bilden har ändrats – kopiera eller ladda ner den igen.';
+    panel.querySelector('#submission-state').classList.remove('exported');
     revision++; clearTimeout(timer); timer = setTimeout(updatePreview, 150);
   }
   panel.querySelector('#student-name').addEventListener('input', updateFields);
   panel.querySelector('#reflection').addEventListener('input', updateFields);
   panel.querySelector('#copy').addEventListener('click', async () => {
     const status = panel.querySelector('#report-copy-status');
+    const key = fieldKey();
     try {
       if (!navigator.clipboard?.write || !window.ClipboardItem) throw new Error('Image clipboard unavailable');
       // Start clipboard.write in the click event; Safari requires user activation.
       await navigator.clipboard.write([new ClipboardItem({ 'image/png': imageBlob() })]);
-      if (!disposed) { status.textContent = 'Bilden är kopierad. Klistra in den till din lärare.'; toast('Resultatbilden är kopierad.'); }
+      exported(key, 'copy');
+      if (!disposed && key === fieldKey()) toast('Resultatbilden är kopierad. Kom ihåg att lämna in!');
     } catch {
       if (!disposed) { status.textContent = 'Webbläsaren tillåter inte bildkopiering här. Välj Ladda ner bild (PNG) och bifoga filen till din lärare.'; panel.querySelector('#download').focus(); }
     }
   });
   panel.querySelector('#download').addEventListener('click', async () => {
+    const key = fieldKey();
     try {
       const blob = await imageBlob();
       if (disposed) return;
       const url = URL.createObjectURL(blob), link = document.createElement('a');
       link.href = url; link.download = `larolabbet-${a.level}-${a.date.slice(0, 10)}.png`;
       document.body.append(link); link.click(); link.remove();
+      exported(key, 'download');
       setTimeout(() => URL.revokeObjectURL(url), 30000);
     } catch { if (!disposed) panel.querySelector('#report-copy-status').textContent = 'Bilden kunde inte skapas. Försök igen.'; }
   });
